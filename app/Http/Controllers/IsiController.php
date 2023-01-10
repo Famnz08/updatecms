@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Isi;
 use App\Models\Comment;
 use App\Models\Artikel;
+use Auth;
 use DB;
 class IsiController extends Controller
 {
@@ -17,14 +18,6 @@ class IsiController extends Controller
         $comment=comment::where('id_artikel','Art01')->get();
         $isi = Isi::where('id_artikel','Art01')->get();
         return view('isi/index',compact(['isi','comment']));
-    }
-    public function store(Request $request){
-        $comment=Comment::create([
-            'comment' => $request->comment,
-            'name' => $request->name,
-            'id_artikel'=>$request->id_artikel
-        ]);
-        return redirect('pisang');
     }
     public function bola(){
         $comment=DB::table('coments')
@@ -40,8 +33,29 @@ class IsiController extends Controller
             
             'comment' => $request->comment,
             'name' => $request->name,
-            'id_artikel'=>$request->id_artikel
+            'id_artikel'=>$request->id_artikel,
+            'id_user'=>$request->id_user
         ]);
         return redirect('bola');
+    }
+
+    public function index($id){
+     $isi=DB::table('isis')
+     ->where('id_artikel',$id)
+     ->get();
+
+     $artikel=DB::table('artikel')
+     ->where('id_artikel',$id)
+     ->get();
+        return view('artikel/detail',compact(['isi','artikel']));
+    }
+    public function store(Request $request){
+        $comment=Comment::create([
+            'comment' =>$request->comment,
+            'name'    =>$request->name,
+            'id_user'=> auth()->user()->id,
+            'id_artikel'=>$request->id_artikel
+        ]);
+        return redirect('artikel');
     }
 }

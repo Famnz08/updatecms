@@ -18,30 +18,50 @@ use App\Http\Controllers\AuthController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('login');
 });
+
 //isi
 Route::get('/berita',[ArtikelController::class,'berita']);
 //pisang
 Route::get('/pisang',[IsiController::class,'isi']);
 Route::post('/pisang/store', [IsiController::class,'store']);
+
 //bola
 
 Route::get('/bola',[IsiController::class,'bola']);
 Route::post('/bola/store', [IsiController::class,'komenbola']);
 
 
+Route::post('/store', [IsiController::class,'store']);
+
+
 //login
+
+Route::group(['middleware'=>'auth','ceklevel:admin,karyawan'],function(){
+    Route::get('/artikel',[ArtikelController::class,'artikel'])->middleware('auth');
+    Route::get('/artikel/tambah', [ArtikelController::class,'create'])->middleware('auth');
+    Route::post('/artikel/store', [ArtikelController::class,'store'])->middleware('auth');
+    Route::get('/artikel/edit/{id}', [ArtikelController::class,'edit'])->middleware('auth');
+    Route::put('/artikel/update/{id}', [ArtikelController::class,'update'])->middleware('auth');
+    Route::get('/artikel/destroy/{id}', [ArtikelController::class,'destroy'])->middleware('auth');
+    
+});
+
+
 Route::get('/login',[AuthController::class,'login'])->name('login');
-Route::post('/postlogin',[AuthController::class,'postlogin']);
-Route::get('/logout',[AuthController::class,'logout']);
+Route::post('/postlogin',[AuthController::class,'postlogin'])->name('postlogin');
+Route::get('/logout',[AuthController::class,'logout'])->name('logout');
+//register
+
+Route::get('/register',[AuthController::class,'register'])->name('register');
+Route::post('/simpanregister',[AuthController::class,'simpanregister'])->name('simpanregister');
 
 
 //admin
 
-Route::get('/artikel',[ArtikelController::class,'artikel'])->middleware('auth');
-Route::get('/artikel/tambah', [ArtikelController::class,'create'])->middleware('auth');
-Route::post('/artikel/store', [ArtikelController::class,'store'])->middleware('auth');
-Route::get('/artikel/edit/{id}', [ArtikelController::class,'edit'])->middleware('auth');
-Route::put('/artikel/update/{id}', [ArtikelController::class,'update'])->middleware('auth');
-Route::get('/artikel/destroy/{id}', [ArtikelController::class,'destroy'])->middleware('auth');
+Route::get('/karyawan',[ArtikelController::class,'karyawan'])->name('karyawan');
+
+//isi
+
+Route::get('/isidetail/isi/{id}', [IsiController::class,'index']);

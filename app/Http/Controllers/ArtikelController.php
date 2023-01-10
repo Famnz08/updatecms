@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Artikel;
+use App\Models\User;
 use App\Models\isi;
 use DB;
 class ArtikelController extends Controller
 {
     public function artikel(){
-        $artikel=Artikel::all();
+        $artikel=Artikel::with('user')->get();
+        //dd($artikel);
         return view('artikel/artikel',compact(['artikel']));
     }
     public function create(){
@@ -34,13 +36,15 @@ class ArtikelController extends Controller
             'foto'=>'required|mimes:jpg,jpeg,png|image|max:2048',
         ]);
         $artikel=Artikel::create([
-            'id_artikel' => $request->id_artikel,
+            //'id_artikel' => $request->id_artikel,
+            'id_user'=> auth()->user()->id,
             'judul' => $request->judul,
             'foto' => $request->foto,
             'nama_artikel' => $request->nama_artikel,
             'kategori'=> $request->kategori
         ]);
-            
+        echo $artikel->id_artikel;
+
         if($request->hasfile('foto')){
             $request->file('foto')->move('images/',$request->file('foto')->getClientOriginalName());
             $artikel->foto = $request->file('foto')->getClientOriginalName();
@@ -49,9 +53,10 @@ class ArtikelController extends Controller
 
         $isi=Isi::create([
             
-            'id_artikel' => $request->id_artikel,
+            'id_artikel' => $artikel->id_artikel,
             'artikel' => $request->artikel          
         ]);
+        
         
         return redirect('artikel');
     }
@@ -77,5 +82,8 @@ class ArtikelController extends Controller
         $artikel->delete();
         return redirect('artikel');
     }
+    //public function karyawan(){
+      //  return view('artikel/karyawan');
+    //}
 
 }
